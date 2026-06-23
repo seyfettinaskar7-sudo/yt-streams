@@ -48,7 +48,7 @@ done
 
 # --- ANA PLAYLIST (M3U) OLUŞTURMA ---
 echo ">>> Ana playlist (m3u) birleştiriliyor..."
-echo "#EXTM3U" > playlist/playlist.m3u
+echo "#EXTM3U" > lists/playlist.m3u
 
 for file in playlist/*.m3u8; do
     [ -s "$file" ] || continue
