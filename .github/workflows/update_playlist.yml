@@ -9,12 +9,15 @@ on:
 permissions:
   contents: write
 
+# Tüm adımların Node.js 24 motorunu kullanmasını zorunlu kılıyoruz
+env:
+  ACTIONS_AUDIT_NODES: 'true'
+
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-    # Node.js uyarılarını engellemek için doğrudan güncel alt sürüme (v4.2.2) sabitledik
     - name: Depoyu Klonla
       uses: actions/checkout@v4.2.2
 
