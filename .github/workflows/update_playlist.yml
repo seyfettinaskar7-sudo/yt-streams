@@ -1,39 +1,19 @@
-name: Update YouTube M3U8 Playlist
-
-on:
-  schedule:
-    # Her 4 saatte bir otomatik çalışması için cron ayarı (İsteğe göre değiştirebilirsin)
-    - cron: '0 */4 * * *'
-  workflow_dispatch: # İstediğinde elinle de butona basıp başlatabilmen için
-
-jobs:
-  update:
-    runs-on: ubuntu-latest
-
-    steps:
+steps:
     - name: Depoyu Klonla
       uses: actions/checkout@v4
 
-    - name: Python ve yt-dlp Kurulumu
+    # En önemli adım: GitHub Secrets'tan veriyi çekip cookies.txt dosyasını oluşturur
+    - name: Cookie Dosyasını Oluştur
+      run: |
+        echo "${{ secrets.YT_COOKIES }}" > cookies.txt
+
+    - name: Bağımlılıkları ve yt-dlp Kurulumunu Yap
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip
-        pip3 install --upgrade yt-dlp
+        sudo apt-get install -y python3
+        sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
+        sudo chmod a+rx /usr/local/bin/yt-dlp
 
-    - name: Playlist Güncelleme Scriptini Çalıştır
+    - name: Python Scriptini Çalıştır
       run: |
-        chmod +x script_adin.sh
-        ./script_adin.sh # Ekran görüntüsündeki kodları barındıran scriptin
-
-    - name: Değişiklikleri Commit Yap ve Pushla
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add .
-        # Eğer değişiklik varsa commitle ve zorla pushla (senin scriptindeki mantık)
-        if ! git diff-index --quiet HEAD --; then
-          git commit -m "Manifest Refresh: $(date +'%d-%m-%Y %H:%M')"
-          git push origin HEAD:main --force
-        else
-          echo "Değişiklik yok, push atlanıyor."
-        fi
+        python3 local_generator.py
