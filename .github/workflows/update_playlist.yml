@@ -9,9 +9,9 @@ on:
 permissions:
   contents: write
 
-# Tüm adımların Node.js 24 motorunu kullanmasını zorunlu kılıyoruz
+# RESMİ GÜNCELLEME: GitHub duyurusundaki Node24 zorlama komutunu buraya ekledik
 env:
-  ACTIONS_AUDIT_NODES: 'true'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   update:
