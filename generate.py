@@ -13,6 +13,7 @@ kanallar = [
     ("Sozcu_Tv", "Sözcü TV", "https://www.youtube.com/@sozcutelevizyonu/live"),
     ("TGRT_Haber", "TGRT Haber", "https://www.youtube.com/@tgrthaber/live"),
     ("Tgrt_Belgesel", "TGRT Belgesel", "https://www.youtube.com/@tgrtbelgeseltv/live"),
+    ("Tgrt_Eu", "TGRT Eu", "https://www.youtube.com/@tgrteutv/live"),
     ("Flash_Haber", "Flash Haber", "https://www.youtube.com/@FlashHaberTV/live"),
     ("Haber_Global_TV", "Haber Global", "https://www.youtube.com/@haberglobal/live"),
     ("TV_100", "TV 100", "https://www.youtube.com/@tv100/live"),
