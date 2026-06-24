@@ -2,24 +2,23 @@ name: Update YouTube M3U8 Playlist
 
 on:
   schedule:
-    # Her 4 saatte bir otomatik çalışır
     - cron: '0 */4 * * *'
-  workflow_dispatch: # Manuel çalıştırma butonu
+  workflow_dispatch:
 
 permissions:
   contents: write
 
-# RESMİ GÜNCELLEME: GitHub duyurusundaki Node24 zorlama komutunu buraya ekledik
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-ok: ubuntu-latest
 
     steps:
-    - name: Depoyu Klonla
-      uses: actions/checkout@v4.2.2
+    # Node.js tabanlı actions/checkout kullanmak yerine, depoyu doğrudan Bash (Git) ile klonluyoruz.
+    # Böylece arka planda hiçbir Node.js sürümü tetiklenmiyor ve sıfır uyarı alıyorsun!
+    - name: Depoyu Git ile Klonla
+      run: |
+        git clone https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.ref_name }}
 
     - name: Python ve yt-dlp Kurulumu
       run: |
