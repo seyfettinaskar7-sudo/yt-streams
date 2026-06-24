@@ -22,6 +22,7 @@ kanallar = [
     ("Krt_Tv", "KRT TV", "https://www.youtube.com/@krtcanli/live"),
     ("Ulusal_Kanal", "Ulusal Kanal", "https://www.youtube.com/@ulusalkanalTV/live"),
     ("Ulke_Tv", "Ülke TV", "https://www.youtube.com/@ulketv/live"),
+    ("Akit_Tv", "Akit TV", "https://www.youtube.com/@akittv/live"),
     ("Eko_Turk", "Eko Türk", "https://www.youtube.com/@ekoturktv/live"),
     ("24_Tv", "24 TV", "https://www.youtube.com/@YirmidortTV/live"),
     ("A_Spor", "A Spor", "https://www.youtube.com/@aspor/live"),
