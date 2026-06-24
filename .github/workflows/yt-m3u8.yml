@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Repo'yu çek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: yt-dlp'yi yükle
         run: pip install yt-dlp
@@ -32,7 +32,7 @@ jobs:
           git diff --cached --quiet || (git commit -m "Update m3u8 files [skip ci]" && git push)
 
       - name: Artifacts olarak ekle (isteğe bağlı)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: m3u8-dosyaları
           path: m3u8/*.m3u8
