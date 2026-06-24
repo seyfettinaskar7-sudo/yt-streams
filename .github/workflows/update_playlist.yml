@@ -10,11 +10,11 @@ permissions:
 
 jobs:
   update:
-    runs-ok: ubuntu-latest
+    # Hata buradaydı, 'runs-ok' yerine doğrusu olan 'runs-on' olarak düzelttik
+    runs-on: ubuntu-latest
 
     steps:
-    # Node.js tabanlı actions/checkout kullanmak yerine, depoyu doğrudan Bash (Git) ile klonluyoruz.
-    # Böylece arka planda hiçbir Node.js sürümü tetiklenmiyor ve sıfır uyarı alıyorsun!
+    # Depoyu Node.js kullanmadan, saf Git ile klonluyoruz (Sıfır Uyarı!)
     - name: Depoyu Git ile Klonla
       run: |
         git clone https://github.com/${{ github.repository }}.git .
