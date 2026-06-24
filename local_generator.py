@@ -29,26 +29,32 @@ kanallar = [
     ("CNBC_E", "CNBC-e", "https://www.youtube.com/@cnbce/live")
 ]
 
-# Çıktı klasörünü ayarla
+# GitHub Secrets'tan gelen e-posta ve şifreyi sistemden çekiyoruz
+yt_user = os.getenv("seyfettinaskar7@gmail.com")
+yt_pass = os.getenv("123456")
+
 streams_dir = "streams"
 os.makedirs(streams_dir, exist_ok=True)
 
 ana_m3u = "#EXTM3U\n"
 current_timestamp = int(time.time())
 
-print("📡 Kanal linkleri cookies.txt ve temiz IP kullanılarak toplanıyor...\n")
+print("📡 Kanal linkleri güvenli giriş ve temiz IP kullanılarak toplanıyor...\n")
 
 for slug, isim, url in kanallar:
     try:
-        # --cookies cookies.txt ve -f b parametreleri ile linki çıkarıyoruz
-        result = subprocess.run(
-            ["/usr/local/bin/yt-dlp", "--cookies", "cookies.txt", "-f", "b", "-g", url],
-            capture_output=True, text=True, timeout=20
-        )
+        # Temel komut setini oluşturuyoruz
+        cmd = ["/usr/local/bin/yt-dlp", "-f", "b", "-g", url]
+        
+        # Eğer GitHub Secrets'tan kullanıcı adı ve şifre başarıyla geldiyse komuta ekle
+        if yt_user and yt_pass:
+            cmd.extend(["--username", seyfettinaskar7@gmail.com , "--password", 123456])
+            
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         link = result.stdout.strip()
         
         if link and link.startswith("http"):
-            # --- YENİLENEN KISIM: Tekil dosyayı HLS Master Playlist standartlarında oluşturma ---
+            # Master Playlist formatında tekil dosya üretimi
             kanal_m3u_icerik = (
                 "#EXTM3U\n"
                 "#EXT-X-VERSION:3\n"
@@ -58,13 +64,13 @@ for slug, isim, url in kanallar:
             with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
                 f.write(kanal_m3u_icerik)
                 
-            # --- YENİLENEN KISIM: Ana playlist'e, ürettiğimiz master playlist'in GitHub Raw linkini ekleme ---
+            # Ana playlist'e yönlendirme linki ekleme
             github_raw_url = f"https://raw.githubusercontent.com/seyfettinaskar7-sudo/yt-streams/main/streams/{slug}.m3u8?t={current_timestamp}"
             ana_m3u += f'#EXTINF:-1,{isim}\n{github_raw_url}\n'
             
-            print(f"✅ {isim} - Master Playlist dosyası üretildi ve ana listeye GitHub linki eklendi.")
+            print(f"✅ {isim} - Master Playlist başarıyla yenilendi.")
         else:
-            print(f"❌ {isim} - Yayın linki çözülemedi.")
+            print(f"❌ {isim} - Yayın linki çözülemendi.")
     except Exception as e:
         print(f"❌ {isim} - Hata oluştu: {e}")
 
@@ -72,20 +78,17 @@ for slug, isim, url in kanallar:
 with open("playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 Dosyalar yerelde hazırlandı. GitHub'a pushlanıyor...")
+print("\n💾 Dosyalar tamamlandı. GitHub'a pushlanıyor...")
 
 # Git Otomasyonu
 try:
     subprocess.run(["git", "config", "user.name", "Lokal Sunucu Proxy"], check=True)
     subprocess.run(["git", "config", "user.email", "sunucu@proxy.local"], check=True)
-    
     subprocess.run(["git", "add", "-A"], check=True)
     subprocess.run("git diff-index --quiet HEAD || git commit -m 'Lokal Otomatik Güncelleme'", shell=True, check=True)
-    
     branch_check = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
     aktif_dal = branch_check.stdout.strip() or "main"
-    
     subprocess.run(["git", "push", "origin", aktif_dal], check=True)
-    print(f"\n🚀 Muazzam! GitHub yüklemesi '{aktif_dal}' dalına başarıyla tamamlandı!")
+    print(f"\n🚀 GitHub yüklemesi '{aktif_dal}' dalına başarıyla tamamlandı!")
 except Exception as e:
     print(f"\n❌ GitHub'a yüklenirken bir sorun çıktı: {e}")
