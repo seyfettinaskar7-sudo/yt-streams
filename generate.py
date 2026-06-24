@@ -90,7 +90,7 @@ try:
     subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=True)
     
     subprocess.run(["git", "add", "-A"], check=True)
-    subprocess.run("git diff-index --quiet HEAD || git commit -m 'Otomatik Playlist Güncellemesi 🔄'", shell=True, check=True)
+    subprocess.run("git diff-index --quiet HEAD || git commit -m 'Update m3u8 files [skip ci]'", shell=True, check=True)
     
     branch_check = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
     aktif_dal = branch_check.stdout.strip() or "main"
