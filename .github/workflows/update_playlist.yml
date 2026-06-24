@@ -2,7 +2,7 @@ name: Update YouTube M3U8 Playlist
 
 on:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */0.30 * * *'
   workflow_dispatch:
 
 permissions:
@@ -13,12 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Exit code 2 hatasını çözmek için önce klasörü temizleyip sonra klonluyoruz
-    - name: Depoyu Git ile Temiz Klonla
-      run: |
-        rm -rf ./* .* 2>/dev/null || true
-        git clone https://github.com/seyfettinaskar7-sudo/yt-streams.git .
-        git checkout ${{ 41898282 }}
+    # Dependabot sadece buradaki '@v4' kısmını otomatik olarak '@v5' (veya en güncel sürüm) yapar.
+    - name: Depoyu Klonla
+      uses: actions/checkout@v5
+      with:
+        token: ${{ github.token }}
 
     - name: Python ve yt-dlp Kurulumu
       run: |
@@ -28,5 +27,8 @@ jobs:
         sudo chmod a+rx /usr/local/bin/yt-dlp
 
     - name: Python Scriptini Çalıştır
+      env:
+        ACTIONS_RUNNER_DEBUG: false
+        ACTIONS_STEP_DEBUG: false
       run: |
-        python3 local_generator.py
+        python3 generate.py
