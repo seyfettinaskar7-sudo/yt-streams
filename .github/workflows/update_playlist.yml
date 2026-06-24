@@ -2,10 +2,10 @@ name: Update YouTube M3U8 Playlist
 
 on:
   schedule:
+    # Her 4 saatte bir otomatik çalışır
     - cron: '0 */4 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # Manuel çalıştırma butonu
 
-# YENİ: GitHub Actions Botuna depoya yazma (push) izni veriyoruz
 permissions:
   contents: write
 
@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Node.js uyarılarını engellemek için doğrudan güncel alt sürüme (v4.2.2) sabitledik
     - name: Depoyu Klonla
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
 
     - name: Python ve yt-dlp Kurulumu
       run: |
