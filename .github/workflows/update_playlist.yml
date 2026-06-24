@@ -2,9 +2,12 @@ name: Update YouTube M3U8 Playlist
 
 on:
   schedule:
-    # Her 4 saatte bir otomatik çalışır
     - cron: '0 */4 * * *'
-  workflow_dispatch: # İstediğin zaman manuel başlatabilmen için buton ekler
+  workflow_dispatch:
+
+# YENİ: GitHub Actions Botuna depoya yazma (push) izni veriyoruz
+permissions:
+  contents: write
 
 jobs:
   update:
