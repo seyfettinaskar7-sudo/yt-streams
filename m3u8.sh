@@ -15,7 +15,7 @@ mkdir -p playlist
 rm -f playlist/*.m3u8
 
 # --- KANALLARI İŞLE ---
-echo ">>> Kanallar taranıyor ve Google Manifest linkleri alınıyor..."
+echo ">>> Kanallar taranıyor ve YouTube canlı yayın linkleri alınıyor..."
 
 cat link.json | jq -c '.[]' | while read -r i; do
     name=$(echo "$i" | jq -r '.name')
@@ -23,15 +23,21 @@ cat link.json | jq -c '.[]' | while read -r i; do
     
     echo ">>> $name güncelleniyor..."
 
-    # 1. Sunucudan HEM başlığı HEM içeriği al (-i)
-    # 2. 'https://manifest.googlevideo.com' ile başlayan o devasa linki cımbızla
-    # 3. Bulunan linkteki gizli karakterleri (\r, \n) temizle
-    raw_manifest=$(curl -i -s --max-time 30 "$target_url" | grep -o "https://manifest.googlevideo.com[^[:space:]\"']*" | head -n 1 | tr -d '\r\n')
+    # --- BURAYA EKLEDİK ---
+    # Eğer link.json içindeki url bir YouTube linkiyse, direkt yt-dlp ile canlı çekiyoruz.
+    # Eğer değilse, senin eski curl yönteminle sunucudan çekmeye devam ediyor.
+    if [[ "$target_url" == *""youtube.com""* ]] || [[ "$target_url" == *""youtu.be""* ]]; then
+        echo "    [YouTube] yt-dlp ve cookies.txt kullanılarak link çıkarılıyor..."
+        raw_manifest=$(yt-dlp --cookies cookies.txt -g -f b "$target_url" 2>/dev/null)
+    else
+        echo "    [API] Sunucudan curl ile link aranıyor..."
+        raw_manifest=$(curl -i -s --max-time 30 "$target_url" | grep -o "https://manifest.googlevideo.com[^[:space:]\"']*" | head -n 1 | tr -d '\r\n')
+    fi
+    # ----------------------
 
     if [ ! -z "$raw_manifest" ] && [[ "$raw_manifest" == http* ]]; then
         # Dosyayı HLS 'Master Playlist' standartlarına uygun oluştur
-        # Bu format, oynatıcıların (VLC, IPTV vb.) GitHub üzerinden linke zıplamasını sağlar
-        cat <<EOF > "playlist/${name}.m3u8"
+        cat <<EOF > "streams/${name}.m3u8"
 #EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720
@@ -39,10 +45,10 @@ $raw_manifest
 EOF
         echo "   [OK] $name başarıyla dosyaya yazıldı."
     else
-        echo "   [!] HATA: $name için link bulunamadı. Sunucu yanıt vermedi veya yayın kapalı."
+        echo "   [!] HATA: $name için link bulunamadı. Yayın kapalı veya yt-dlp engellendi."
     fi
     
-    # Sunucuyu (FastAPI) yormamak için her kanal arasında 1 saniye bekle
+    # İstekler arasında 1 saniye bekle
     sleep 1
 done
 
@@ -56,9 +62,9 @@ for file in playlist/*.m3u8; do
     
     # Sadece Google linkini başarıyla çekmiş dosyaları ana listeye ekle
     if grep -q "googlevideo" "$file"; then
-        echo "#EXTINF:-1,$fname" >> playlist/playlist.m3u
+        echo "#EXTINF:-1,$fname" >> lists/playlist.m3u
         # GitHub Raw Linkinin sonuna timestamp ekleyerek cache sorununu önlüyoruz
-        echo "https://raw.githubusercontent.com/seyfettinaskar7-sudo/yt-streams/main/streams/${fname}.m3u8?t=$(date +%s)" >> playlist/playlist.m3u
+        echo "https://raw.githubusercontent.com/seyfettinaskar7-sudo/yt-streams/main/streams/${fname}.m3u8?t=$(date +%s)" >> lists/playlist.m3u
     fi
 done
 
