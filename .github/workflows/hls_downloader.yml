@@ -2,7 +2,7 @@ name: YouTube HLS Downloader
 
 on:
   schedule:
-    - cron: '0 */1 * * *'  # Her 1 saatte bir (UTC)
+    - cron: '* */10 * * *'  # Her 10 dakikada bir (UTC)
   workflow_dispatch:      # Elle tetiklemek için
 
 jobs:
