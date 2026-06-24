@@ -30,6 +30,7 @@ kanallar = [
     ("Bein_Spor_Haber", "Bein Spor Haber", "https://www.youtube.com/@beINSPORTST%C3%BCrkiye/live"),
     ("Bizim_Ev_Tv", "Bizimev TV", "https://www.youtube.com/@bizimevtv2000/live"),
     ("CNBC_E", "CNBC-e", "https://www.youtube.com/@cnbce/live")
+    ("Diyanet_Cocuk", "Diyanet Çocuk", "https://www.youtube.com/@DiyanetCocuk/live")
 ]
 
 streams_dir = "streams"
