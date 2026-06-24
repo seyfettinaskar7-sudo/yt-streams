@@ -39,7 +39,7 @@ os.makedirs(streams_dir, exist_ok=True)
 ana_m3u = "#EXTM3U\n"
 current_timestamp = int(time.time())
 
-print("📡 Kanal linkleri anonim istemci ve mobil taklidiyle toplanıyor...\n")
+print("📡 Kanal linkleri anonim istemci ile toplanıyor...\n")
 
 for slug, isim, url in kanallar:
     try:
