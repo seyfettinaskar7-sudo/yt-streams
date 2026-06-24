@@ -10,13 +10,13 @@ permissions:
 
 jobs:
   update:
-    # Hata buradaydı, 'runs-ok' yerine doğrusu olan 'runs-on' olarak düzelttik
     runs-on: ubuntu-latest
 
     steps:
-    # Depoyu Node.js kullanmadan, saf Git ile klonluyoruz (Sıfır Uyarı!)
-    - name: Depoyu Git ile Klonla
+    # Exit code 2 hatasını çözmek için önce klasörü temizleyip sonra klonluyoruz
+    - name: Depoyu Git ile Temiz Klonla
       run: |
+        rm -rf ./* .* 2>/dev/null || true
         git clone https://github.com/${{ github.repository }}.git .
         git checkout ${{ github.ref_name }}
 
