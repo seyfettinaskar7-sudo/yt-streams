@@ -11,7 +11,7 @@ kanallar = [
     ("Haber_Turk", "Haber Türk", "https://www.youtube.com/@haberturktv/live"),
     ("Halk_Tv", "Halk TV", "https://www.youtube.com/@Halktvkanali/live"),
     ("Sozcu_Tv", "Sözcü TV", "https://www.youtube.com/@sozcutelevizyonu/live"),
-    ("Tgrt_Haber", "TGRT Haber", "https://www.youtube.com/@tgrthaber/live"),
+    ("TGRT_Haber", "TGRT Haber", "https://www.youtube.com/@tgrthaber/live"),
     ("Tgrt_Belgesel", "TGRT Belgesel", "https://www.youtube.com/@tgrtbelgeseltv/live"),
     ("Flash_Haber", "Flash Haber", "https://www.youtube.com/@FlashHaberTV/live"),
     ("Haber_Global_TV", "Haber Global", "https://www.youtube.com/@haberglobal/live"),
