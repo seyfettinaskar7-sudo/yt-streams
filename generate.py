@@ -32,6 +32,7 @@ kanallar = [
     ("Bizim_Ev_Tv", "Bizimev TV", "https://www.youtube.com/@bizimevtv2000/live"),
     ("CNBC_E", "CNBC-e", "https://www.youtube.com/@cnbce/live")
     ("Diyanet_Cocuk", "Diyanet Çocuk", "https://www.youtube.com/@DiyanetCocuk/live")
+    ("Kemal_Sunal_Tv", "Kemal Sunal TV", "https://www.youtube.com/@GulsahFilmOfficial/live")
 ]
 
 streams_dir = "streams"
