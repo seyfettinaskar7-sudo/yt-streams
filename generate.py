@@ -47,30 +47,26 @@ for slug, isim, url in kanallar:
     try:
         # DEĞİŞİKLİK BURADA: Şifre/Token yok.
         # YouTube engellerini aşmak için botun kendisini "Android Client" olarak tanıtmasını sağladık.
-        cmd = [
-            "yt-dlp",
-            "--extractor-args", "youtube:player-client=android", 
-            "-f", "b", 
-            "-g", url
-        ]
-            
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+        # Cron altında çalışırken hata vermemesi için full path (/usr/local/bin/yt-dlp) kullanıyoruz
+    result = subprocess.run(
+         ["/usr/local/bin/yt-dlp", "--extractor-args", "youtube:player-client=android", "-f", "best", "-g", url],
+        capture_output=True, text=True, timeout=20
+        )
         link = result.stdout.strip()
         
         if link and link.startswith("http"):
-            # Master Playlist formatı
-            kanal_m3u_icerik = (
-                "#EXTM3U\n"
-                "#EXT-X-VERSION:3\n"
-                "#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n"
-                f"{link}\n"
-            )
+            # 1. Her kanal için tekil m3u8 dosyası üretimi
+            kanal_m3u_icerik = f"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n{link}\n"
             with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
                 f.write(kanal_m3u_icerik)
                 
-            github_raw_url = f"https://raw.githubusercontent.com/seyfettinaskar7-sudo/yt-streams/main/streams/{slug}.m3u8?t={current_timestamp}"
-            # M3U içerik yapısını başlatıyoruz
-ana_m3u = "#EXTM3U\n"
+            # 2. Ana playlist.m3u dosyasına ekleme
+            ana_m3u += f'#EXTINF:-1,{isim}\n{link}\n'
+            print(f"✅ {isim} linki alındı ve dosyası üretildi.")
+        else:
+            print(f"❌ {isim} - Yayın linki çözülemedi.")
+    except Exception as e:
+        print(f"❌ {isim} - Hata oluştu: {e}")
 
 # streams klasöründeki güncellenmiş m3u8 dosyalarını tarayıp ana listeye ekliyoruz
 import os
@@ -84,8 +80,9 @@ if os.path.exists("streams"):
             ana_m3u += f'#EXTINF:-1,{kanal_adi}\n'
             ana_m3u += f'streams/{dosya_adi}\n'
 
-# Tamamlanan m3u listesini playlist.m3u dosyasına kaydediyoruz
+# Toplu m3u listesini kaydet
 with open("lists/playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 İşlem tamam. playlist.m3u ve tüm kanal dosyaları başarıyla oluşturuldu."
+print("\n💾 Dosyalar yerelde hazırlandı. GitHub'a pushlanıyor...")
+ 
