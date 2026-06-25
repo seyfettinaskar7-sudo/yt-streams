@@ -68,18 +68,6 @@ for slug, isim, url in kanallar:
     except Exception as e:
         print(f"❌ {isim} - Hata oluştu: {e}")
 
-# streams klasöründeki güncellenmiş m3u8 dosyalarını tarayıp ana listeye ekliyoruz
-import os
-if os.path.exists("streams"):
-    for dosya_adi in sorted(os.listdir("streams")):
-        if dosya_adi.endswith(".m3u8"):
-            # Dosya adından kanal adını temizliyoruz (Örn: TRT_Haber.m3u8 -> TRT Haber)
-            kanal_adi = dosya_adi.replace(".m3u8", "").replace("_", " ")
-            
-            # Her kanal için standart M3U formatını alt alta ekliyoruz
-            ana_m3u += f'#EXTINF:-1,{kanal_adi}\n'
-            ana_m3u += f'streams/{dosya_adi}\n'
-
 # Toplu m3u listesini kaydet
 with open("lists/playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
