@@ -48,7 +48,7 @@ for slug, isim, url in kanallar:
         # DEĞİŞİKLİK BURADA: Şifre/Token yok.
         # YouTube engellerini aşmak için botun kendisini "Android Client" olarak tanıtmasını sağladık.
         cmd = [
-            "/usr/local/bin/yt-dlp", 
+            "yt-dlp",
             "--extractor-args", "youtube:player-client=android", 
             "-f", "b", 
             "-g", url
