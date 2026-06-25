@@ -78,7 +78,7 @@ for slug, isim, url in kanallar:
         print(f"❌ {isim} - Hata: {e}")
 
 # Playlist kaydet
-with open("playlist.m3u", "w", encoding="utf-8") as f:
+with open("lists/playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
 print("\n💾 İşlem tamam. GitHub'a pushlanıyor...")
