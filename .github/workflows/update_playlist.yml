@@ -112,4 +112,4 @@ jobs:
           # Depodaki her şeyi (generate.py, lists/playlist.m3u ve streams/ klasörünü) ekler
           git add -A
           
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Script, ana liste ve tüm kanallar otomatik güncellendi [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update m3u8 files [skip ci]" && git push)
