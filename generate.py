@@ -1,6 +1,4 @@
-import os
 import subprocess
-import time
 
 kanallar = [
     ("TRT_Haber", "TRT Haber", "https://www.youtube.com/@trthaber/live"),
@@ -34,44 +32,12 @@ kanallar = [
     ("Kemal_Sunal_Tv", "Kemal Sunal TV", "https://www.youtube.com/@GulsahFilmOfficial/live")
 ]
 
-streams_dir = "streams"
-lists_dir = "lists"
-os.makedirs(streams_dir, exist_ok=True)
-os.makedirs(lists_dir, exist_ok=True)
-
-ana_m3u = "#EXTM3U\n"
-
-print("📡 Tüm kanalların güncel linkleri sırayla toplanıyor...\n")
-
-for slug, isim, url in kanallar:
-    try:
+with open("raw_links.txt", "w", encoding="utf-8") as f:
+    for slug, isim, url in kanallar:
         result = subprocess.run(
-            [
-                "yt-dlp",
-                "--extractor-args", "youtube:player-client=android,web_embedded",
-                "--no-check-certificates",
-                "--prefer-free-formats",
-                "-f", "best", 
-                "-g", 
-                url
-            ],
-            capture_output=True, text=True, timeout=30
+            ["yt-dlp", "--extractor-args", "youtube:player-client=android,web_embedded", "--no-check-certificates", "-f", "best", "-g", url],
+            capture_output=True, text=True
         )
         link = result.stdout.strip()
-        
         if link and link.startswith("http"):
-            kanal_m3u_icerik = f"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n{link}\n"
-            with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
-                f.write(kanal_m3u_icerik)
-                
-            ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
-            print(f"✅ {isim} başarıyla güncellendi.")
-        else:
-            print(f"❌ {isim} - Link çözülemedi, boş döndü. Hata: {result.stderr.strip()}")
-    except Exception as e:
-        print(f"❌ {isim} - Hata: {e}")
-
-with open(f"{lists_dir}/playlist.m3u", "w", encoding="utf-8") as f:
-    f.write(ana_m3u)
-
-print("\n💾 Python taraflı tüm yerel işlemler bitti.")
+            f.write(f"{slug}|{isim}|{link}\n")
