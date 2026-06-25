@@ -50,7 +50,11 @@ for slug, isim, url in kanallar:
     try:
         # HATA BURADAYDI: Satırları 8 boşluk içeri kaydırarak try bloğuna dahil ettik.
         result = subprocess.run(
-            ["yt-dlp", "--extractor-args", "youtube:player-client=android", "-f", "best", "-g", url],
+            try:
+            ["yt-dlp", "--extractor-args", "youtube:player-client=web_embedded", "-f", "best", "-g", url],
+            capture_output=True, text=True, timeout=20
+        )
+        link = result.stdout.strip()
             capture_output=True, text=True, timeout=20
         )
         link = result.stdout.strip()
