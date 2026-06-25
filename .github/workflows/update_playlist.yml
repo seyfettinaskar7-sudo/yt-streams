@@ -24,17 +24,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install yt-dlp
-      - name: Gerekli Klasörleri Otomatik Oluştur (lists ve streams)
+
+      # 1. Klasörleri önceden terminale zorla açtırıyoruz
+      - name: Klasörleri Otomatik Oluştur
         run: |
           mkdir -p streams
           mkdir -p lists
-          
-      - name: generate.py Dosyasını Otomatik Oluştur/Güncelle
+
+      # 2. Python sadece YouTube linklerini çözer ve terminalin okuyabileceği bir dosyaya yazar
+      - name: YouTube Canlı Yayın Linklerini Çöz
         run: |
           cat << 'EOF' > generate.py
-          import os
           import subprocess
-          import time
 
           kanallar = [
               ("TRT_Haber", "TRT Haber", "https://www.youtube.com/@trthaber/live"),
@@ -68,60 +69,53 @@ jobs:
               ("Kemal_Sunal_Tv", "Kemal Sunal TV", "https://www.youtube.com/@GulsahFilmOfficial/live")
           ]
 
-          streams_dir = "streams"
-          lists_dir = "lists"
-          os.makedirs(streams_dir, exist_ok=True)
-          os.makedirs(lists_dir, exist_ok=True)
-
-          ana_m3u = "#EXTM3U\n"
-
-          print("📡 Tüm kanalların güncel linkleri sırayla toplanıyor...\n")
-
-          for slug, isim, url in kanallar:
-              try:
+          # Geçici bir metin dosyasına ham sonuçları yazıyoruz
+          with open("raw_links.txt", "w", encoding="utf-8") as f:
+              for slug, isim, url in kanallar:
                   result = subprocess.run(
-                      [
-                          "yt-dlp",
-                          "--extractor-args", "youtube:player-client=android,web_embedded",
-                          "--no-check-certificates",
-                          "--prefer-free-formats",
-                          "-f", "best", 
-                          "-g", 
-                          url
-                      ],
-                      capture_output=True, text=True, timeout=30
+                      ["yt-dlp", "--extractor-args", "youtube:player-client=android,web_embedded", "--no-check-certificates", "-f", "best", "-g", url],
+                      capture_output=True, text=True
                   )
                   link = result.stdout.strip()
-                  
                   if link and link.startswith("http"):
-                      kanal_m3u_icerik = f"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n{link}\n"
-                      with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
-                          f.write(kanal_m3u_icerik)
-                          
-                      ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
-                      print(f"✅ {isim} başarıyla güncellendi.")
-                  else:
-                      print(f"❌ {isim} - Link çözülemedi, boş döndü. Hata: {result.stderr.strip()}")
-              except Exception as e:
-                  print(f"❌ {isim} - Hata: {e}")
-
-          with open(f"{lists_dir}/playlist.m3u", "w", encoding="utf-8") as f:
-              f.write(ana_m3u)
-
-          print("\n💾 Python taraflı tüm yerel işlemler bitti.")
+                      f.write(f"{slug}|{isim}|{link}\n")
           EOF
+          python generate.py
 
-      # Sunucuda az önce oluşturulan en güncel generate.py dosyasını çalıştırıyoruz
-      - name: Python Kodunu Çalıştır ve Linkleri Topla
-        run: python generate.py
+      # 3. Tam olarak senin istediğin yöntem: Terminal, gelen linklerle dosyaları çatır çatır oluşturur
+       Bocası Otomatik Yazma Adımı
+      - name: Tekil Kanalları ve Ana Listeyi Otomatik Oluştur/Güncelle
+        run: |
+          # Ana M3U dosyasının başlangıcını yazıyoruz
+          echo "#EXTM3U" > lists/playlist.m3u
+          
+          # Satır satır çözülen linkleri okuyup dosyaları oluşturuyoruz
+          while IFS="|" read -r slug isim link; do
+            if [ -n "$link" ]; then
+              
+              # Tam senin yazdığın cat << 'EOF' mantığıyla terminale yazdırıyoruz:
+              cat << EOF > "streams/${slug}.m3u8"
+          #EXTM3U
+          #EXT-X-VERSION:3
+          #EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720
+          ${link}
+          EOF
+              
+              # Ana listenin (playlist.m3u) içine de ekleme yapıyoruz
+              echo "#EXTINF:-1,${isim}" >> lists/playlist.m3u
+              echo "streams/${slug}.m3u8" >> lists/playlist.m3u
+              echo "✅ ${isim} terminal tarafından oluşturuldu."
+            fi
+          done < raw_links.txt
 
-      # En kritik aşama: git add -A komutu generate.py dahil deponun tüm halini paketleyip yükler
-      - name: Değişiklikleri Kaydet ve Depoya Gönder (Push)
+      # 4. Her şeyi depoya pushlama
+      - name: Değişiklikleri Kaydet ve Gönder (Push)
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Depodaki her şeyi (generate.py, lists/playlist.m3u ve streams/ klasörünü) ekler
-          git add -A
+          # raw_links ve geçici scripti temizleyelim depon kalabalık gözükmesin
+          rm -f raw_links.txt get_links.py
           
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update files [skip ci]" && git push)
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Terminal ile streams/ ve lists/ klasörleri güncellendi [skip ci]" && git push)
