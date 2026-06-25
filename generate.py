@@ -82,20 +82,3 @@ with open("playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
 print("\n💾 İşlem tamam. GitHub'a pushlanıyor...")
-
-# Git Otomasyonu (GitHub Actions Bot Kimliğiyle)
-try:
-    # GitHub'ın resmi otomatik sistem botu e-postası ve ismi
-    subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
-    subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=True)
-    
-    subprocess.run(["git", "add", "-A"], check=True)
-    subprocess.run("git diff-index --quiet HEAD || git commit -m 'Update m3u8 files [skip ci]'", shell=True, check=True)
-    
-    branch_check = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
-    aktif_dal = branch_check.stdout.strip() or "main"
-    
-    subprocess.run(["git", "push", "origin", aktif_dal], check=True)
-    print(f"\n🚀 Muazzam! GitHub Actions botu '{aktif_dal}' dalına yüklemeyi başarıyla yaptı!")
-except Exception as e:
-    print(f"\n❌ GitHub Botu yükleme yaparken bir sorun çıktı: {e}")
