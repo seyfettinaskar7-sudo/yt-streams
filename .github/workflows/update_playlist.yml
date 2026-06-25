@@ -93,7 +93,7 @@ ${link}
 EOF
               echo "#EXTINF:-1,${isim}" >> lists/playlist.m3u
               echo "streams/${slug}.m3u8" >> lists/playlist.m3u
-              print("Kanal yazildi.")
+              echo "✅ ${isim} yazildi."
             fi
           done < raw_links.txt
 
