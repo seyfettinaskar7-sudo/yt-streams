@@ -25,5 +25,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install yt-dlp
 
-      - name: Canlı Yayınları Topla ve Git'e Yükle
-        run: python generate.py # Python dosyanın adı neyse onu yaz
+      - name: Canlı Yayınları Topla
+        run: python generate.py
+
+      - name: Değişiklikleri Bot ile Kaydet ve Pushla
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Update m3u8 files [skip ci]" || echo "Değişiklik yok"
+          git push
