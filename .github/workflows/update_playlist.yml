@@ -26,13 +26,13 @@ jobs:
           pip install yt-dlp
 
       - name: Playlist Oluştur
-        run: python generate_playlist.py
+        run: python generate.py
 
       # Üçüncü parti paket yerine doğrudan standart Git komutları kullanıyoruz
       - name: Değişiklikleri Kaydet ve Gönder
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add playlist.m3u
+          git add lists/playlist.m3u
           # Eğer değişiklik varsa commit et ve pushla, yoksa hata vermeden geç
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update m3u8 files [skip ci]" && git push)
