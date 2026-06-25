@@ -69,16 +69,23 @@ for slug, isim, url in kanallar:
                 f.write(kanal_m3u_icerik)
                 
             github_raw_url = f"https://raw.githubusercontent.com/seyfettinaskar7-sudo/yt-streams/main/streams/{slug}.m3u8?t={current_timestamp}"
-            ana_m3u += f'#EXTINF:-1,{isim}\n{github_raw_url}\n'
-            
-            print(f"✅ {isim} - Başarıyla güncellendi.")
-        else:
-            print(f"❌ {isim} - Link çözülemedi (YouTube IP engeli atmış olabilir).")
-    except Exception as e:
-        print(f"❌ {isim} - Hata: {e}")
+            # M3U içerik yapısını başlatıyoruz
+ana_m3u = "#EXTM3U\n"
 
-# Playlist kaydet
+# streams klasöründeki güncellenmiş m3u8 dosyalarını tarayıp ana listeye ekliyoruz
+import os
+if os.path.exists("streams"):
+    for dosya_adi in sorted(os.listdir("streams")):
+        if dosya_adi.endswith(".m3u8"):
+            # Dosya adından kanal adını temizliyoruz (Örn: TRT_Haber.m3u8 -> TRT Haber)
+            kanal_adi = dosya_adi.replace(".m3u8", "").replace("_", " ")
+            
+            # Her kanal için standart M3U formatını alt alta ekliyoruz
+            ana_m3u += f'#EXTINF:-1,{kanal_adi}\n'
+            ana_m3u += f'streams/{dosya_adi}\n'
+
+# Tamamlanan m3u listesini playlist.m3u dosyasına kaydediyoruz
 with open("lists/playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 İşlem tamam. GitHub'a pushlanıyor...")
+print("\n💾 İşlem tamam. playlist.m3u ve tüm kanal dosyaları başarıyla oluşturuldu."
