@@ -32,7 +32,7 @@ jobs:
 
       - name: YouTube Canli Yayin Linklerini Coz
         run: |
-          cat << 'EOF' > get_links.py
+          cat << 'EOF' > generate.py
           import subprocess
 
           kanallar = [
@@ -77,7 +77,7 @@ jobs:
                   if link and link.startswith("http"):
                       f.write(f"{slug}|{isim}|{link}\n")
           EOF
-          python get_links.py
+          python generate.py
 
       - name: Tekil Kanallari ve Ana Listeyi Olustur
         run: |
