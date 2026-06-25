@@ -9,7 +9,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Botun kod yükleyebilmesi için şart
+      contents: write # GitHub'ın kendi sistemine şifresiz yazma izni verir
 
     steps:
       - name: Depoyu Klonla
@@ -26,9 +26,9 @@ jobs:
           pip install yt-dlp
 
       - name: Canlı Yayınları Topla
-        run: python generate.py
+        run: python generate_playlist.py # Python dosyanın adı neyse onu yaz
 
-      - name: Değişiklikleri Bot ile Kaydet ve Pushla
+      - name: Değişiklikleri Şifresiz ve Otomatik Pushla
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
