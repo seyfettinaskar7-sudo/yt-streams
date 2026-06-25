@@ -1,9 +1,9 @@
-name: Playlist ve Script Güncelle
+name: Playlist ve Klasorleri Otomatik Guncelle
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # 15 dakikada bir otomatik çalışır
-  workflow_dispatch: # Elinle başlatman için buton açar
+    - cron: '*/15 * * * *' # 15 dakikada bir otomatik calisir
+  workflow_dispatch: # Elinle baslatman icin buton acar
 
 jobs:
   update:
@@ -25,16 +25,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install yt-dlp
 
-      # 1. Klasörleri önceden terminale zorla açtırıyoruz
-      - name: Klasörleri Otomatik Oluştur
+      - name: Klasorleri Otomatik Olustur
         run: |
           mkdir -p streams
           mkdir -p lists
 
-      # 2. Python sadece YouTube linklerini çözer ve terminalin okuyabileceği bir dosyaya yazar
-      - name: YouTube Canlı Yayın Linklerini Çöz
+      - name: YouTube Canli Yayin Linklerini Coz
         run: |
-          cat << 'EOF' > generate.py
+          cat << 'EOF' > get_links.py
           import subprocess
 
           kanallar = [
@@ -69,7 +67,6 @@ jobs:
               ("Kemal_Sunal_Tv", "Kemal Sunal TV", "https://www.youtube.com/@GulsahFilmOfficial/live")
           ]
 
-          # Geçici bir metin dosyasına ham sonuçları yazıyoruz
           with open("raw_links.txt", "w", encoding="utf-8") as f:
               for slug, isim, url in kanallar:
                   result = subprocess.run(
@@ -80,42 +77,30 @@ jobs:
                   if link and link.startswith("http"):
                       f.write(f"{slug}|{isim}|{link}\n")
           EOF
-          python generate.py
+          python get_links.py
 
-      # 3. Tam olarak senin istediğin yöntem: Terminal, gelen linklerle dosyaları çatır çatır oluşturur
-       Bocası Otomatik Yazma Adımı
-      - name: Tekil Kanalları ve Ana Listeyi Otomatik Oluştur/Güncelle
+      - name: Tekil Kanallari ve Ana Listeyi Olustur
         run: |
-          # Ana M3U dosyasının başlangıcını yazıyoruz
           echo "#EXTM3U" > lists/playlist.m3u
           
-          # Satır satır çözülen linkleri okuyup dosyaları oluşturuyoruz
           while IFS="|" read -r slug isim link; do
             if [ -n "$link" ]; then
-              
-              # Tam senin yazdığın cat << 'EOF' mantığıyla terminale yazdırıyoruz:
-              cat << EOF > "streams/${slug}.m3u8"
-          #EXTM3U
-          #EXT-X-VERSION:3
-          #EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720
-          ${link}
-          EOF
-              
-              # Ana listenin (playlist.m3u) içine de ekleme yapıyoruz
+          cat << EOF > "streams/${slug}.m3u8"
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720
+${link}
+EOF
               echo "#EXTINF:-1,${isim}" >> lists/playlist.m3u
               echo "streams/${slug}.m3u8" >> lists/playlist.m3u
-              echo "✅ ${isim} terminal tarafından oluşturuldu."
+              print("Kanal yazildi.")
             fi
           done < raw_links.txt
 
-      # 4. Her şeyi depoya pushlama
-      - name: Değişiklikleri Kaydet ve Gönder (Push)
+      - name: Degisiklikleri Kaydet ve Gonder
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
-          # raw_links ve geçici scripti temizleyelim depon kalabalık gözükmesin
           rm -f raw_links.txt get_links.py
-          
           git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Terminal ile streams/ ve lists/ klasörleri güncellendi [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update files [skip ci]" && git push)
