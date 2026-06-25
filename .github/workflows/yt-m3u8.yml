@@ -1,4 +1,1 @@
-name: YouTube HLS Downloader with yt-dlp
 
-on:
-  workflow_dispatch: # Sadece GitHub'dan elinle başlatman için
