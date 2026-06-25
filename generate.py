@@ -38,43 +38,36 @@ kanallar = [
 streams_dir = "streams"
 os.makedirs(streams_dir, exist_ok=True)
 
-# listeleri kaydetmek için klasör kontrolü
-os.makedirs("lists", exist_ok=True)
-
 ana_m3u = "#EXTM3U\n"
-current_timestamp = int(time.time())
 
-print("📡 Kanal linkleri anonim istemci ile toplanıyor...\n")
+print("📡 Kanal linkleri web_embedded istemcisi ile toplanıyor...\n")
 
 for slug, isim, url in kanallar:
     try:
-        # HATA BURADAYDI: Satırları 8 boşluk içeri kaydırarak try bloğuna dahil ettik.
+        # YouTube engellerini aşmak için en kararlı web oynatıcı taklidini yapıyoruz
         result = subprocess.run(
-            try:
             ["yt-dlp", "--extractor-args", "youtube:player-client=web_embedded", "-f", "best", "-g", url],
-            capture_output=True, text=True, timeout=20
-        )
-        link = result.stdout.strip()
             capture_output=True, text=True, timeout=20
         )
         link = result.stdout.strip()
         
         if link and link.startswith("http"):
-            # 1. Her kanal için tekil m3u8 dosyası üretimi
+            # 1. Tekil kanal dosyası üretimi
             kanal_m3u_icerik = f"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n{link}\n"
             with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
                 f.write(kanal_m3u_icerik)
                 
-            # 2. Ana playlist.m3u dosyasına kanal linki yerine yerel dosya yolunu ekliyoruz
+            # 2. Ana playlist.m3u dosyasına kanalın eklenmesi (M3U Standart format)
             ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
-            print(f"✅ {isim} linki alındı ve dosyası üretildi.")
+            print(f"✅ {isim} linki başarıyla alındı.")
         else:
-            print(f"❌ {isim} - Yayın linki çözülemedi.")
+            print(f"❌ {isim} - Yayın linki boş döndü.")
+            
     except Exception as e:
-        print(f"❌ {isim} - Hata oluştu: {e}")
+        print(f"❌ {isim} - Süreç sırasında hata oluştu: {e}")
 
-# Tam M3U listesini kaydediyoruz
+# Ana listenin kaydedilmesi
 with open("playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 Dosyalar başarıyla hazırlandı. GitHub Actions sistemi deponu güncelleyecek.")
+print("\n💾 Tüm işlemler bitti. Dosyalar başarıyla güncellendi.")
