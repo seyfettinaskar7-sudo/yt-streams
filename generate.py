@@ -46,8 +46,16 @@ print("📡 Tüm kanalların güncel linkleri sırayla toplanıyor...\n")
 for slug, isim, url in kanallar:
     try:
         result = subprocess.run(
-            ["yt-dlp", "--extractor-args", "youtube:player-client=web_embedded", "-f", "best", "-g", url],
-            capture_output=True, text=True, timeout=20
+            [
+                "yt-dlp",
+                "--extractor-args", "youtube:player-client=android,web_embedded",
+                "--no-check-certificates",
+                "--prefer-free-formats",
+                "-f", "best", 
+                "-g", 
+                url
+            ],
+            capture_output=True, text=True, timeout=30
         )
         link = result.stdout.strip()
         
@@ -59,7 +67,7 @@ for slug, isim, url in kanallar:
             ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
             print(f"✅ {isim} başarıyla güncellendi.")
         else:
-            print(f"❌ {isim} - Canlı yayın linki çözülemedi.")
+            print(f"❌ {isim} - Link çözülemedi, boş döndü. Hata: {result.stderr.strip()}")
     except Exception as e:
         print(f"❌ {isim} - Hata: {e}")
 
