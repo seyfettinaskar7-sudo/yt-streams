@@ -19,7 +19,7 @@ for channel in channels:
         )
         m3u8_url = result.stdout.strip()
         if m3u8_url.startswith("http"):
-            with open(f"{name}.m3u8", "w", encoding="utf-8") as f_out:
+            with open(f"streams/{name}.m3u8", "w", encoding="utf-8") as f_out:
                 f_out.write(m3u8_url + "\n")
             print(f"✅ Kaydedildi: {name}.m3u8")
         else:
