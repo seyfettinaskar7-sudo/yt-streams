@@ -27,11 +27,12 @@ jobs:
 
       - name: Playlist Oluştur
         run: python generate.py
-        
-      - name: Değişiklikleri Şifresiz ve Otomatik Pushla
+
+      # Üçüncü parti paket yerine doğrudan standart Git komutları kullanıyoruz
+      - name: Değişiklikleri Kaydet ve Gönder
         run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Update m3u8 files [skip ci]" || echo "Değişiklik yok"
-          git push
+          git add playlist.m3u
+          # Eğer değişiklik varsa commit et ve pushla, yoksa hata vermeden geç
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated Playlist Update" && git push)
