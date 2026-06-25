@@ -24,7 +24,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install yt-dlp
-
+      - name: Gerekli Klasörleri Otomatik Oluştur (lists ve streams)
+        run: |
+          mkdir -p streams
+          mkdir -p lists
+          
       - name: generate.py Dosyasını Otomatik Oluştur/Güncelle
         run: |
           cat << 'EOF' > generate.py
