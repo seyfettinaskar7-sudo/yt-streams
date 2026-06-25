@@ -85,12 +85,9 @@ jobs:
           
           while IFS="|" read -r slug isim link; do
             if [ -n "$link" ]; then
-          cat << EOF > "streams/${slug}.m3u8"
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720
-${link}
-EOF
+              # Hata yapma ihtimali sifir olan tertemiz echo yontemi:
+              echo -e "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n${link}" > "streams/${slug}.m3u8"
+              
               echo "#EXTINF:-1,${isim}" >> lists/playlist.m3u
               echo "streams/${slug}.m3u8" >> lists/playlist.m3u
               echo "✅ ${isim} yazildi."
@@ -103,4 +100,4 @@ EOF
           git config --local user.name "github-actions[bot]"
           rm -f raw_links.txt get_links.py
           git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update files [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Terminal tabanli guncelleme yapildi [skip ci]" && git push)
