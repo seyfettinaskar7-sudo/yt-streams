@@ -26,7 +26,7 @@ jobs:
           pip install yt-dlp
 
       - name: Canlı Yayınları Topla
-        run: python generate_playlist.py # Python dosyanın adı neyse onu yaz
+        run: python generate.py # Python dosyanın adı neyse onu yaz
 
       - name: Değişiklikleri Şifresiz ve Otomatik Pushla
         run: |
