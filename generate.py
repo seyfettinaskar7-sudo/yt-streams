@@ -38,6 +38,9 @@ kanallar = [
 streams_dir = "streams"
 os.makedirs(streams_dir, exist_ok=True)
 
+# listeleri kaydetmek için klasör kontrolü
+os.makedirs("lists", exist_ok=True)
+
 ana_m3u = "#EXTM3U\n"
 current_timestamp = int(time.time())
 
@@ -45,12 +48,10 @@ print("📡 Kanal linkleri anonim istemci ile toplanıyor...\n")
 
 for slug, isim, url in kanallar:
     try:
-        # DEĞİŞİKLİK BURADA: Şifre/Token yok.
-        # YouTube engellerini aşmak için botun kendisini "Android Client" olarak tanıtmasını sağladık.
-        # Cron altında çalışırken hata vermemesi için full path (/usr/local/bin/yt-dlp) kullanıyoruz
-    result = subprocess.run(
-         ["/usr/local/bin/yt-dlp", "--extractor-args", "youtube:player-client=android", "-f", "best", "-g", url],
-        capture_output=True, text=True, timeout=20
+        # HATA BURADAYDI: Satırları 8 boşluk içeri kaydırarak try bloğuna dahil ettik.
+        result = subprocess.run(
+            ["yt-dlp", "--extractor-args", "youtube:player-client=android", "-f", "best", "-g", url],
+            capture_output=True, text=True, timeout=20
         )
         link = result.stdout.strip()
         
@@ -60,17 +61,16 @@ for slug, isim, url in kanallar:
             with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
                 f.write(kanal_m3u_icerik)
                 
-            # 2. Ana playlist.m3u dosyasına ekleme
-            ana_m3u += f'#EXTINF:-1,{isim}\n{link}\n'
+            # 2. Ana playlist.m3u dosyasına kanal linki yerine yerel dosya yolunu ekliyoruz
+            ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
             print(f"✅ {isim} linki alındı ve dosyası üretildi.")
         else:
             print(f"❌ {isim} - Yayın linki çözülemedi.")
     except Exception as e:
         print(f"❌ {isim} - Hata oluştu: {e}")
 
-# Toplu m3u listesini kaydet
-with open("lists/playlist.m3u", "w", encoding="utf-8") as f:
+# Tam M3U listesini kaydediyoruz
+with open("playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 Dosyalar yerelde hazırlandı. GitHub'a pushlanıyor...")
- 
+print("\n💾 Dosyalar başarıyla hazırlandı. GitHub Actions sistemi deponu güncelleyecek.")
