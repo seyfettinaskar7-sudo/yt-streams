@@ -2,14 +2,14 @@ name: Playlist Güncelle
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Her 15 dakikada bir otomatik çalışır
-  workflow_dispatch: # Elle başlatma butonu
+    - cron: '*/15 * * * *'  # Her 15 dakikada bir otomatik çalışır
+  workflow_dispatch:       # Elle başlatma butonu
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # GitHub'ın kendi sistemine şifresiz yazma izni verir
+      contents: write
 
     steps:
       - name: Depoyu Klonla
@@ -25,9 +25,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install yt-dlp
 
-      - name: Canlı Yayınları Topla
-        run: python generate.py # Python dosyanın adı neyse onu yaz
-
+      - name: Playlist Oluştur
+        run: python generate.py
+        
       - name: Değişiklikleri Şifresiz ve Otomatik Pushla
         run: |
           git config --local user.name "github-actions[bot]"
