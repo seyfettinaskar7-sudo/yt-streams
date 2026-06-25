@@ -35,16 +35,20 @@ kanallar = [
     ("Kemal_Sunal_Tv", "Kemal Sunal TV", "https://www.youtube.com/@GulsahFilmOfficial/live")
 ]
 
+# Gerekli klasörlerin otomatik oluşturulması
 streams_dir = "streams"
+lists_dir = "lists"
 os.makedirs(streams_dir, exist_ok=True)
+os.makedirs(lists_dir, exist_ok=True)
 
+# Ana M3U başlığı
 ana_m3u = "#EXTM3U\n"
 
-print("📡 Kanal linkleri web_embedded istemcisi ile toplanıyor...\n")
+print("📡 Tüm kanalların güncel linkleri sırayla toplanıyor...\n")
 
 for slug, isim, url in kanallar:
     try:
-        # YouTube engellerini aşmak için en kararlı web oynatıcı taklidini yapıyoruz
+        # YouTube korumasını web_embedded taklidi ile aşıyoruz
         result = subprocess.run(
             ["yt-dlp", "--extractor-args", "youtube:player-client=web_embedded", "-f", "best", "-g", url],
             capture_output=True, text=True, timeout=20
@@ -52,22 +56,22 @@ for slug, isim, url in kanallar:
         link = result.stdout.strip()
         
         if link and link.startswith("http"):
-            # 1. Tekil kanal dosyası üretimi
+            # 1. Klasörün içine her kanal için tekil m3u8 dosyası üretimi
             kanal_m3u_icerik = f"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n{link}\n"
             with open(f"{streams_dir}/{slug}.m3u8", "w", encoding="utf-8") as f:
                 f.write(kanal_m3u_icerik)
                 
-            # 2. Ana playlist.m3u dosyasına kanalın eklenmesi (M3U Standart format)
+            # 2. lists/playlist.m3u dosyasının içine bu kanalın yerel yolunu ekleme
             ana_m3u += f'#EXTINF:-1,{isim}\n{streams_dir}/{slug}.m3u8\n'
-            print(f"✅ {isim} linki başarıyla alındı.")
+            print(f"✅ {isim} başarıyla güncellendi.")
         else:
-            print(f"❌ {isim} - Yayın linki boş döndü.")
+            print(f"❌ {isim} - Canlı yayın linki çözülemedi, boş döndü.")
             
     except Exception as e:
-        print(f"❌ {isim} - Süreç sırasında hata oluştu: {e}")
+        print(f"❌ {isim} - İstek atılırken bir sorun oluştu: {e}")
 
-# Ana listenin kaydedilmesi
-with open("playlist.m3u", "w", encoding="utf-8") as f:
+# 3. Tüm kanalların eklendiği ana listeyi lists/playlist.m3u altına kaydetme
+with open(f"{lists_dir}/playlist.m3u", "w", encoding="utf-8") as f:
     f.write(ana_m3u)
 
-print("\n💾 Tüm işlemler bitti. Dosyalar başarıyla güncellendi.")
+print("\n💾 Harika! liste ve tüm kanallar 'lists/' ile 'streams/' klasörlerine başarıyla işlendi.")
